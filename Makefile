@@ -32,6 +32,7 @@ check:
 	@$(LN) --version | head --lines=1
 	@$(MV) --version | head --lines=1
 
+# Note that this will error out if local changes are not committed
 deploy: $(BUILDDIR)/uscheme.html
 	git checkout gh-pages
 	$(MV) $(BUILDDIR)/uscheme.html index.html

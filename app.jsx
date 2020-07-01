@@ -33,7 +33,7 @@ const ReplLine = ({ onSuccess }) => {
   return (
     <Form onSubmit={handleSubmit}>
       <Form.Group>
-        <Form.Control disabled={successful} autoFocus size="lg" style={style} ref={inputRef}></Form.Control>
+        <Form.Control as="textarea" disabled={successful} autoFocus size="lg" style={style} ref={inputRef}></Form.Control>
         { output ? (<Form.Text>{output}</Form.Text>) : null }
       </Form.Group>
     </Form>
