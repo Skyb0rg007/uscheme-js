@@ -11964,7 +11964,9 @@ const ReplLine = ({
     size: "lg",
     style: style,
     ref: inputRef
-  }), output ? /*#__PURE__*/React.createElement(Form.Text, null, output) : null));
+  }), output ? /*#__PURE__*/React.createElement(Form.Text, null, output) : null, /*#__PURE__*/React.createElement(Button, {
+    type: "submit"
+  }, "Run")));
 };
 
 const Repl = () => {
