@@ -35,6 +35,7 @@ const ReplLine = ({ onSuccess }) => {
       <Form.Group>
         <Form.Control as="textarea" disabled={successful} autoFocus size="lg" style={style} ref={inputRef}></Form.Control>
         { output ? (<Form.Text>{output}</Form.Text>) : null }
+        <Button type="submit">Run</Button>
       </Form.Group>
     </Form>
   );
