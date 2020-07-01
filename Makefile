@@ -40,7 +40,7 @@ $(BUILDDIR)/amalg.js: $(BUILDDIR)/output.html
 # Build with smltojs
 $(BUILDDIR)/output.html: src/uscheme.mlb src/mlscheme.sml src/run.sml src/stubs.sml | $(BUILDDIR)
 	$(SMLTOJS) --output $(basename $@) $<
-	$(RM) --recusive MLB
+	$(RM) --recursive MLB
 
 $(BUILDDIR)/app.js: ./app.jsx $(BUILDDIR)/babel
 	$(BUILDDIR)/babel --plugins $(BABEL_PLUGINS) $< > $@
