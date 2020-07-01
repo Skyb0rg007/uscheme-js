@@ -8,7 +8,7 @@ fun make_interp () : string -> JsCore.Object.t =
       let
         val () = (TextIO.stdOutBuf := ""; TextIO.stdErrBuf := "")
         val (basis, counter) = !state
-        val xdefs = stringsxdefs ("<website>", [str])
+        val xdefs = stringsxdefs ("<website>", String.fields (fn c => c = #"\n") str)
         val basis' = readEvalPrintWith eprintln (xdefs, basis, (NOT_PROMPTING, PRINTING))
         val stdout = !TextIO.stdOutBuf
         val stderr = !TextIO.stdErrBuf
