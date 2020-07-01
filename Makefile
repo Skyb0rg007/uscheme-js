@@ -8,10 +8,12 @@ SED = sed
 RM = rm --force
 LN = ln --symbolic
 HEAD = head
+GIT = git
+MV = mv --force
 
 BUILDDIR = _build
 
-.PHONY: check clean
+.PHONY: check clean deploy
 
 all: $(BUILDDIR)/uscheme.html
 
@@ -23,10 +25,20 @@ clean:
 check:
 	@$(SMLTOJS) --version
 	@echo "npm $$($(NPM) --version)"
+	@$(GIT) --version
 	@$(MKDIR) --version | head --lines=1
 	@$(SED) --version | head --lines=1
 	@$(RM) --version | head --lines=1
 	@$(LN) --version | head --lines=1
+	@$(MV) --version | head --lines=1
+
+deploy: $(BUILDDIR)/uscheme.html
+	git checkout gh-pages
+	$(MV) $(BUILDDIR)/uscheme.html index.html
+	git add index.html
+	git commit -m 'updated site'
+	git push
+	git checkout -
 
 $(BUILDDIR):
 	$(MKDIR) $@
