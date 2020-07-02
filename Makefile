@@ -43,8 +43,6 @@ deploy: $(BUILDDIR)/uscheme.html
 
 $(BUILDDIR):
 	$(MKDIR) $@
-$(BUILDDIR)/babel-src:
-	$(MKDIR) $@
 
 # Take all the smltojs dependencies and amalgamate them
 $(BUILDDIR)/amalg.js: $(BUILDDIR)/output.html
@@ -58,10 +56,20 @@ $(BUILDDIR)/output.html: src/uscheme.mlb src/mlscheme.sml src/run.sml src/stubs.
 $(BUILDDIR)/app.js: ./app.jsx $(BUILDDIR)/babel
 	$(BUILDDIR)/babel --plugins $(BABEL_PLUGINS) $< > $@
 
+# Babel
+$(BUILDDIR)/babel-src:
+	$(MKDIR) $@
 $(BUILDDIR)/babel-src/node_modules/.bin/babel: | $(BUILDDIR)/babel-src
 	cd $(BUILDDIR)/babel-src && $(NPM) install @babel/core @babel/cli @babel/plugin-transform-react-jsx
 $(BUILDDIR)/babel: $(BUILDDIR)/babel-src/node_modules/.bin/babel
 	if test ! -e $@; then $(LN) ./babel-src/node_modules/.bin/babel $@; fi
+
+# Codemirror
+$(BUILDDIR)/codemirror:
+	$(MKDIR) $@
+
+$(BUILDDIR)/codemirror/node_modules/codemirror: | $(BUILDDIR)/codemirror
+	cd $(BUILDDIR)/codemirror && $(NPM) install codemirror
 
 $(BUILDDIR)/uscheme.html: template.html $(BUILDDIR)/app.js $(BUILDDIR)/amalg.js
 	$(SED) \
