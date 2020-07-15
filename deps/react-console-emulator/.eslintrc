@@ -1,0 +1,28 @@
+{
+  "env": {
+    "es2020": true,
+    "node": true,
+    "jest": true,
+    "browser": true
+  },
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "globalReturn": true,
+      "jsx": true
+    },
+    "sourceType": "module"
+  },
+  "extends": [
+    "standard",
+    "standard-react"
+  ],
+  "plugins": [
+    "standard"
+  ],
+  "rules": {
+    "react/jsx-closing-bracket-location": "off",
+    "react/jsx-handler-names": "off",
+    "react/jsx-tag-spacing": "off"
+  }
+}
