@@ -30,7 +30,9 @@ export default () => {
       <Navbar bg="light" expand="lg">
         <Navbar.Brand>Comp 105</Navbar.Brand>
         <Nav>
-          <Nav.Link href="#" onSelect={run}>Run</Nav.Link>
+          <Container>
+            <Nav.Link className="bg-success" href="#" onSelect={run}>Run</Nav.Link>
+          </Container>
         </Nav>
       </Navbar>
       <Container>

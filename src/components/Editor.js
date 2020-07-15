@@ -8,10 +8,11 @@ import 'codemirror/theme/gruvbox-dark.css';
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/addon/comment/comment';
-require('codemirror/mode/scheme/scheme');
+import './uscheme-mode';
+// import 'codemirror/mode/scheme/scheme';
 
 const Editor = ({ valRef }) => {
-  const [value, setValue] = React.useState(';; Enter code here!');
+  const [value, setValue] = React.useState(';; Enter code here!\n\n');
   React.useEffect(() => {
     valRef.current = value;
   }, [valRef, value]);
@@ -26,7 +27,7 @@ const Editor = ({ valRef }) => {
     setValue(value);
   };
   const opts = {
-    mode: 'scheme',
+    mode: 'uscheme',
     theme: 'gruvbox-dark',
     smartIndent: true,
     lineNumbers: true,

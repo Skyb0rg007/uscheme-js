@@ -29,7 +29,7 @@ fun make_interp () : string -> string =
 
 val () =
   JsCore.exec1
-  { stmt = "uscheme.make_interp = make_interp;"
+  { stmt = "window.uscheme.make_interp = make_interp;"
   , arg1 = ("make_interp", JsCore.==> (JsCore.unit, JsCore.==> (JsCore.string, JsCore.string)))
   , res = JsCore.unit
   }

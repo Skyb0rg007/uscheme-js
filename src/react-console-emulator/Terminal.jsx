@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Component } from 'react'
 import defaults from 'defaults'
 import isEqual from 'react-fast-compare'

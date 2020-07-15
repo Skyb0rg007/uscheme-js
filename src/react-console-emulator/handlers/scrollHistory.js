@@ -1,3 +1,4 @@
+/* eslint-disable */
 import cleanArray from '../utils/cleanArray'
 import sendCursorToEnd from '../utils/sendCursorToEnd'
 
