@@ -12,11 +12,10 @@ end
 structure TextIO =
 struct
 
-  val stdOutBuf = ref ""
-  val stdErrBuf = ref ""
+  val outputBuf = ref ""
 
-  fun stdOut x = stdOutBuf := !stdOutBuf ^ x
-  fun stdErr x = stdErrBuf := !stdErrBuf ^ x
+  fun stdOut x = outputBuf := !outputBuf ^ x
+  fun stdErr x = outputBuf := !outputBuf ^ x
 
   fun output (f, x) = f x
 

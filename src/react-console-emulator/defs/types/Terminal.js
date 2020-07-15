@@ -40,8 +40,9 @@ const labelTypes = {
 }
 
 const commandTypes = {
-  commands: PropTypes.object.isRequired, // Cannot validate beyond this because names are dynamic
-  commandCallback: PropTypes.func
+  // commands: PropTypes.object.isRequired, // Cannot validate beyond this because names are dynamic
+  // commandCallback: PropTypes.func
+  runCommand: PropTypes.func.isRequired
 }
 
 const messageTypes = {

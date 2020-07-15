@@ -21,7 +21,6 @@ export default class Terminal extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      commands: {},
       stdout: [],
       history: [],
       historyPosition: null,
@@ -51,30 +50,9 @@ export default class Terminal extends Component {
     setTimeout(() => { rootNode.scrollTop = rootNode.scrollHeight }, 1)
   }
 
-  validateCommands = () => {
-    const { commands, noDefaults, ignoreCommandCase } = this.props
-    const validCommands = validateCommands(commands, this.showHelp, this.clearStdout, { noDefaults, ignoreCommandCase })
-    this.setState({ commands: validCommands })
-  }
-
   showWelcomeMessage = () => {
     const msg = this.props.welcomeMessage
-
-    if (typeof msg === 'boolean') this.pushToStdout('Welcome to the React terminal! Type \'help\' to get a list of commands.')
-    else if (Array.isArray(msg)) msg.map(item => this.pushToStdout(item))
-    else this.pushToStdout(msg)
-  }
-
-  /* istanbul ignore next: Covered by interactivity tests */
-  showHelp = () => {
-    const { commands } = this.state
-
-    for (const c in commands) {
-      const cmdObj = commands[c]
-      const usage = cmdObj.usage ? ` - ${cmdObj.usage}` : ''
-
-      this.pushToStdout(`${c} - ${cmdObj.description}${usage}`)
-    }
+    this.pushToStdout(msg)
   }
 
   /**
@@ -133,7 +111,6 @@ export default class Terminal extends Component {
   processCommand = () => {
     this.setState({ processing: true }, () => {
       // Initialise command result object
-      const commandResult = { command: null, args: [], rawInput: null, result: null }
       const rawInput = this.terminalInput.current.value
 
       if (!this.props.noHistory) this.pushToHistory(rawInput)
@@ -147,35 +124,14 @@ export default class Terminal extends Component {
       }
 
       if (rawInput) {
-        const input = rawInput.split(' ')
-        const rawCommand = input.splice(0, 1)[0] // Removed portion is returned...
-        const args = input // ...and the rest can be used
-
-        commandResult.rawInput = rawInput
-        commandResult.command = rawCommand
-        commandResult.args = args
-
-        const { exists, command } = commandExists(this.state.commands, rawCommand, this.props.ignoreCommandCase)
-
-        if (!exists) {
-          this.pushToStdout(this.props.errorText
-            ? this.props.errorText.replace(/\[command\]/gi, command)
-            : `Command '${rawCommand}' not found!`
-          )
-        } else {
-          const cmd = this.state.commands[command]
-          const res = cmd.fn(...args)
-
-          this.pushToStdout(res)
-          commandResult.result = res
-          if (cmd.explicitExec) cmd.fn(...args)
-        }
+        const res = this.props.runCommand(rawInput);
+        if (res)
+          this.pushToStdout(res);
       }
 
       this.setState({ processing: false }, () => {
         this.clearInput()
         if (!this.props.noAutoScroll) this.scrollToBottom()
-        if (this.props.commandCallback) this.props.commandCallback(commandResult)
       })
     })
   }
@@ -201,16 +157,22 @@ export default class Terminal extends Component {
       case 'Enter': this.processCommand(); break
       case 'ArrowUp': this.scrollHistory('up'); break
       case 'ArrowDown': this.scrollHistory('down'); break
+      default:
+        // Ctrl + L
+        if (event.ctrlKey && event.keyCode === 76) {
+          this.clearStdout();
+          event.preventDefault();
+        }
     }
   }
 
-  componentDidUpdate (prevProps) {
+  // componentDidUpdate (prevProps) {
     // If there was a change in commands, re-validate
-    if (!isEqual(prevProps.commands, this.props.commands)) this.validateCommands()
-  }
+    // if (!isEqual(prevProps.commands, this.props.commands)) this.validateCommands()
+  // }
 
   componentDidMount () {
-    this.validateCommands()
+    // this.validateCommands()
     if (this.props.welcomeMessage) this.showWelcomeMessage()
     /* istanbul ignore next: Covered by interactivity tests */
     if (this.props.autoFocus) this.focusTerminal()
