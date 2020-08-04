@@ -4248,7 +4248,7 @@ fun processPredefined (def,basis) =
 val _ = op noninteractive    : interactivity
 val _ = op processPredefined : def * basis -> basis
 (* <shared read-eval-print loop and [[processPredefined]]>= *)
-fun readEvalPrintWith errmsg (xdefs, basis, interactivity) =
+fun readEvalPrintWith usemap errmsg (xdefs, basis, interactivity) =
   let val unitTests = ref []
 
 (* <definition of [[processXDef]], which can modify [[unitTests]] and call [[errmsg]]>= *)
@@ -4260,14 +4260,20 @@ fun readEvalPrintWith errmsg (xdefs, basis, interactivity) =
             (* [[readEvalPrintWith]].                       *)
             (* <definition of [[useFile]], to read from a file>= *)
             fun useFile filename =
-              let val fd = TextIO.openIn filename
-                  val (_, printing) = interactivity
-                  val inter' = (NOT_PROMPTING, printing)
-              in  readEvalPrintWith errmsg (filexdefs (filename, fd, noPrompts),
-                                                                  basis, inter')
-                  before TextIO.closeIn fd
-              end
-            fun try (USE filename) = (* MODIFY *) (eprintln "\"use\" is not available in the online repl"; basis)
+              readEvalPrintWith usemap errmsg
+              (stringsxdefs (filename, String.fields (fn c => c = #"\n") (usemap filename))
+              , basis
+              , (NOT_PROMPTING, snd interactivity))
+              handle NotFound filename => (eprintln ("Unable to find \"" ^ filename ^ "\"!"); basis)
+              (* let val fd = TextIO.openIn filename *)
+                  (* val (_, printing) = interactivity *)
+                  (* val inter' = (NOT_PROMPTING, printing) *)
+              (* in  readEvalPrintWith errmsg (filexdefs (filename, fd, noPrompts), *)
+                                                                  (* basis, inter') *)
+                  (* before TextIO.closeIn fd *)
+              (* end *)
+            fun try (USE filename) = useFile filename
+      (* (* MODIFY *) (eprintln "\"use\" is not available in the online repl"; basis) *)
               | try (TEST t)       = (unitTests := t :: !unitTests; basis)
               | try (DEF def)      = processDef (def, basis, interactivity)
               | try (DEFS ds)      = foldl processXDef basis (map DEF ds)
@@ -4291,7 +4297,7 @@ fun readEvalPrintWith errmsg (xdefs, basis, interactivity) =
       val basis = streamFold processXDef basis xdefs
       val _     = processTests (!unitTests, basis)
 (* <boxed values 108>=                          *)
-val _ = op readEvalPrintWith : (string -> unit) ->                     xdef
+val _ = op readEvalPrintWith : (string -> string) -> (string -> unit) ->                     xdef
                                          stream * basis * interactivity -> basis
 val _ = op processXDef       : xdef * basis -> basis
   in  basis
@@ -5003,7 +5009,7 @@ val initialBasis =
                "(define list8 (x y z a b c d e) (cons x (list7 y z a b c d e)))"
                       ]
       val xdefs = stringsxdefs ("predefined functions", fundefs)
-  in  readEvalPrintWith predefinedFunctionError (xdefs, rho, noninteractive)
+  in  readEvalPrintWith (fn f => raise NotFound f) predefinedFunctionError (xdefs, rho, noninteractive)
   end
 (* The most important exceptions are [[RuntimeError]], *)
 (* [[NotFound]], and [[Located]]. Exceptions    *)
@@ -5050,7 +5056,7 @@ fun runAs interactivity =
   let val _ = setup_error_format interactivity
       val prompts = if prompts interactivity then stdPrompts else noPrompts
       val xdefs = filexdefs ("standard input", TextIO.stdIn, prompts)
-  in  ignore (readEvalPrintWith eprintln (xdefs, initialBasis, interactivity))
+  in  ignore (readEvalPrintWith (fn f => raise NotFound f) eprintln (xdefs, initialBasis, interactivity))
   end 
 (* Utility function for limiting the depth of recursion *)
 (*                                              *)

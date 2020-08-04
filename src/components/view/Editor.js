@@ -1,51 +1,54 @@
-
 import React from 'react';
-// import PropTypes from 'prop-types';
-// import InterpContext from '../contexts/Interpreter';
+import PropTypes from 'prop-types';
+import InterpContext from '../../contexts/Interpreter';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/gruvbox-dark.css';
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/addon/comment/comment';
-// import './uscheme-mode';
-import 'codemirror/mode/scheme/scheme';
-import { useLocalStorage } from '../util';
+import './uscheme-mode';
+// import 'codemirror/mode/scheme/scheme';
 
-const Editor = ({ valRef, onCtrlEnter }) => {
-  const [value, setValue] = useLocalStorage('editor-value', ';; Enter code here!\n\n');
-  React.useEffect(() => {
-    valRef.current = value;
-  }, [valRef, value]);
+const Editor = ({ onCtrlEnter, value, onEdit }) => {
+
   const [instance, setInstance] = React.useState(null);
+  const { mode, autoCloseBrackets } = React.useContext(InterpContext);
+
+  // Setup the key bindings
   React.useEffect(() => {
+    // Edit for more keybindings
     const keyMap = {
       'Ctrl-/': cm => cm.toggleComment(),
       'Ctrl-Enter': cm => onCtrlEnter(cm)
     };
-    if (instance) {
+    if (instance)
       instance.addKeyMap(keyMap);
-    }
   }, [instance, onCtrlEnter]);
-  const onBeforeChange = (editor, data, value) => {
-    setValue(value);
-  };
-  const opts = {
-    mode: 'scheme',
+
+  const options = {
+    mode: mode,
     theme: 'gruvbox-dark',
     smartIndent: true,
     lineNumbers: true,
     matchBrackets: true,
-    autoCloseBrackets: '()[]{}',
+    autoCloseBrackets: autoCloseBrackets,
   };
+
   return (
     <CodeMirror
       value={value}
-      onBeforeChange={onBeforeChange}
-      options={opts}
+      onBeforeChange={(_editor, _data, value) => onEdit(value)}
+      options={options}
       editorDidMount={editor => setInstance(editor)}
     />
   );
+};
+
+Editor.propTypes = {
+  onCtrlEnter: PropTypes.func.isRequired,
+  value: PropTypes.string.isRequired,
+  onEdit: PropTypes.func.isRequired
 };
 
 export default Editor;
